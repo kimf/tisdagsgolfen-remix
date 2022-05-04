@@ -1,7 +1,7 @@
 import { json } from '@remix-run/node';
 import type { LoaderFunction } from '@remix-run/node';
-import { Heading } from '@chakra-ui/react';
-import { useLoaderData } from '@remix-run/react';
+import { Button, Heading } from '@chakra-ui/react';
+import { Link, useLoaderData } from '@remix-run/react';
 import type { Season } from '@prisma/client';
 
 import db from '~/lib/db.server';
@@ -35,6 +35,9 @@ export default function Index() {
 
   return (
     <div>
+      <Link to="/play">
+        <Button colorScheme="green">NY RUNDA</Button>
+      </Link>
       <Heading>Tisdagsgolfen {season.name}</Heading>
       <Stats />
       <SeasonLeaderboard season={season} />
