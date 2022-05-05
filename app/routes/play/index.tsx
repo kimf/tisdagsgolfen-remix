@@ -1,9 +1,9 @@
 import React from 'react';
 import { json } from '@remix-run/node';
 import type { LoaderFunction } from '@remix-run/node';
-import { Button, Center, Divider, Heading, Radio, RadioGroup, Stack } from '@chakra-ui/react';
-import { Form, Link, useLoaderData } from '@remix-run/react';
-import type { Course, Player, Team } from '@prisma/client';
+import { Button } from '@chakra-ui/react';
+import { useLoaderData } from '@remix-run/react';
+import type { Course, eventscoring, eventtype, Player } from '@prisma/client';
 
 import db from '~/lib/db.server';
 import Initial from '~/components/Setup/Initial';
@@ -13,37 +13,43 @@ import Setup from '~/components/Setup/Setup';
 export const loader: LoaderFunction = async () => {
   const courses = await db.course.findMany();
   const players = await db.player.findMany();
-  return json({ courses, players });
+  return json({ courses, players: players.map((p) => ({ ...p, playerId: p.id, strokes: 10 })) });
 };
-
-export interface PlayerWithStrokes extends Player {
+export interface UnsavedTeam {
+  strokes: number;
+  playerIds: number[];
+}
+export interface UnsavedPlayer extends Player {
   strokes: number;
 }
+
 export interface PlayState {
-  step: string;
-  weekType: string;
-  eventType: string;
-  scoringType: string;
+  step: 'initial' | 'players' | 'setup';
+  special: boolean;
+  eventType: eventtype;
+  scoringType: eventscoring;
   course?: Course;
-  players: PlayerWithStrokes[];
-  teams: Team[];
+  players: UnsavedPlayer[];
+  teams: UnsavedTeam[];
 }
 
 const steps = ['initial', 'players', 'setup'];
 
-export default function Index() {
-  const { courses, players } = useLoaderData<{ courses: Course[]; players: Player[] }>();
+export default function PlayIndex() {
+  const { courses, players } = useLoaderData<{ courses: Course[]; players: UnsavedPlayer[] }>();
   const [playState, setPlayState] = React.useState<PlayState>({
     step: 'initial',
-    weekType: 'normal',
-    eventType: 'individual',
-    scoringType: 'points',
+    special: false,
+    eventType: 'INDIVIDUAL',
+    scoringType: 'POINTS',
     course: undefined,
     players: [],
     teams: [],
   });
 
-  const setPlayStateKey = (key: string, value: any) => setPlayState({ ...playState, [key]: value });
+  const setPlayStateKey = (key: string, value: any) =>
+    setPlayState((prev) => ({ ...prev, [key]: value }));
+
   const stepBack = () => {
     const index = steps.findIndex((s) => s === playState.step);
     if (index > 0) {
@@ -68,7 +74,6 @@ export default function Index() {
       {playState.step === 'setup' && (
         <Setup playState={playState} setPlayStateKey={setPlayStateKey} />
       )}
-      <pre>{JSON.stringify(playState, undefined, 2)}</pre>
     </div>
   );
 }

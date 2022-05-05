@@ -1,12 +1,12 @@
 import React from 'react';
-import { Button, Center, Checkbox, CheckboxGroup, Divider, Heading, Stack } from '@chakra-ui/react';
-import type { Player } from '@prisma/client';
-import type { PlayerWithStrokes } from '~/routes/play';
+import { Button, Center, Checkbox, Divider, Heading, Stack } from '@chakra-ui/react';
+import type { Player, eventtype } from '@prisma/client';
+import type { UnsavedPlayer } from '~/routes/play/index';
 
 const SelectPlayers: React.FC<{
-  players: PlayerWithStrokes[];
-  chosenPlayers: PlayerWithStrokes[];
-  eventType: string;
+  players: Player[];
+  chosenPlayers: UnsavedPlayer[];
+  eventType: eventtype;
   setPlayStateKey: (key: string, value: any) => void;
 }> = ({ players, chosenPlayers, eventType, setPlayStateKey }) => {
   const chosenPlayerIds = chosenPlayers.map((p) => p.id.toString());
@@ -20,10 +20,22 @@ const SelectPlayers: React.FC<{
     } else {
       const player = players.find((p) => p.id.toString() === id);
       if (player) {
-        player.strokes = player.strokes || 10;
-        setPlayStateKey('players', [...chosenPlayers, player]);
+        const scoringPlayer: UnsavedPlayer = { ...player, strokes: 10 };
+        setPlayStateKey('players', [...chosenPlayers, scoringPlayer]);
       }
     }
+  };
+
+  const gotoSetup = () => {
+    if (eventType === 'TEAM') {
+      setPlayStateKey('teams', [
+        { strokes: 10, playerIds: [] },
+        { strokes: 10, playerIds: [] },
+        { strokes: 10, playerIds: [] },
+        { strokes: 10, playerIds: [] },
+      ]);
+    }
+    setPlayStateKey('step', 'setup');
   };
 
   return (
@@ -33,7 +45,7 @@ const SelectPlayers: React.FC<{
       </Heading>
 
       <Stack spacing={2} direction="column">
-        {players.map((player: Player) => (
+        {players.map((player) => (
           <Checkbox
             name="playerIds"
             key={player.id}
@@ -49,8 +61,8 @@ const SelectPlayers: React.FC<{
         <Divider />
       </Center>
       {chosenPlayers.length !== 0 && (
-        <Button colorScheme="green" onClick={() => setPlayStateKey('step', 'setup')}>
-          {eventType === 'individual' ? 'Ställ in slag' : 'Sätt upp lag'}
+        <Button colorScheme="green" onClick={gotoSetup}>
+          {eventType === 'INDIVIDUAL' ? 'Ställ in slag' : 'Sätt upp lag'}
         </Button>
       )}
     </div>

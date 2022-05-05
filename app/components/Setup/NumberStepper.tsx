@@ -2,10 +2,11 @@ import { Button, HStack, Input, useNumberInput } from '@chakra-ui/react';
 
 const NumberStepper: React.FC<{
   setValue: (val: number) => void;
-}> = ({ setValue }) => {
+  value: number;
+}> = ({ setValue, value }) => {
   const { getInputProps, getIncrementButtonProps, getDecrementButtonProps } = useNumberInput({
     step: 1,
-    defaultValue: 10,
+    defaultValue: value,
     min: -10,
     max: 40,
     onChange: (val) => setValue(parseInt(val, 10)),

@@ -1,8 +1,19 @@
 import React from 'react';
-import { Button, Center, Divider, Heading, Radio, RadioGroup, Stack } from '@chakra-ui/react';
+import {
+  Button,
+  Center,
+  Divider,
+  FormControl,
+  FormLabel,
+  Heading,
+  Radio,
+  RadioGroup,
+  Stack,
+  Switch,
+} from '@chakra-ui/react';
 
 import type { Course } from '@prisma/client';
-import type { PlayState } from '~/routes/play';
+import type { PlayState } from '~/routes/play/index';
 
 const Initial: React.FC<{
   playState: PlayState;
@@ -16,20 +27,19 @@ const Initial: React.FC<{
 
   return (
     <div>
-      <RadioGroup
-        name="weekType"
-        onChange={(val) => setPlayStateKey('weekType', val)}
-        value={playState.weekType}
-      >
-        <Stack spacing={5} direction="row">
-          <Radio size="lg" colorScheme="green" value="normal">
-            Vanlig vecka
-          </Radio>
-          <Radio size="lg" colorScheme="green" value="special">
-            Specialvecka
-          </Radio>
-        </Stack>
-      </RadioGroup>
+      <FormControl display="flex" alignItems="center">
+        <FormLabel htmlFor="special" mb="0">
+          Specialvecka?
+        </FormLabel>
+
+        <Switch
+          id="special"
+          size="md"
+          colorScheme="green"
+          isChecked={playState.special}
+          onChange={(e) => setPlayStateKey('special', e.target.checked)}
+        />
+      </FormControl>
       <Center height="20px">
         <Divider />
       </Center>
@@ -39,10 +49,10 @@ const Initial: React.FC<{
         value={playState.eventType}
       >
         <Stack spacing={5} direction="row">
-          <Radio size="lg" colorScheme="green" value="individual">
+          <Radio size="lg" colorScheme="green" value="INDIVIDUAL">
             Individuellt
           </Radio>
-          <Radio size="lg" colorScheme="green" value="team">
+          <Radio size="lg" colorScheme="green" value="TEAM">
             Lag
           </Radio>
         </Stack>
@@ -56,10 +66,10 @@ const Initial: React.FC<{
         value={playState.scoringType}
       >
         <Stack spacing={5} direction="row">
-          <Radio size="lg" colorScheme="green" value="points">
+          <Radio size="lg" colorScheme="green" value="POINTS">
             Poäng
           </Radio>
-          <Radio size="lg" colorScheme="green" value="strokes">
+          <Radio size="lg" colorScheme="green" value="STROKES">
             Slag
           </Radio>
         </Stack>
