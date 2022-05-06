@@ -1,12 +1,12 @@
 import React from 'react';
 import { Button, Center, Checkbox, Divider, Heading, Stack } from '@chakra-ui/react';
-import type { Player, eventtype } from '@prisma/client';
-import type { UnsavedPlayer } from '~/routes/play/index';
+import type { definitions } from 'types/supabase';
+import type { ScoringPlayer } from './SetupWrapper';
 
 const SelectPlayers: React.FC<{
-  players: Player[];
-  chosenPlayers: UnsavedPlayer[];
-  eventType: eventtype;
+  players: definitions['players'][];
+  chosenPlayers: ScoringPlayer[];
+  eventType: definitions['events']['type'];
   setPlayStateKey: (key: string, value: any) => void;
 }> = ({ players, chosenPlayers, eventType, setPlayStateKey }) => {
   const chosenPlayerIds = chosenPlayers.map((p) => p.id.toString());
@@ -20,7 +20,7 @@ const SelectPlayers: React.FC<{
     } else {
       const player = players.find((p) => p.id.toString() === id);
       if (player) {
-        const scoringPlayer: UnsavedPlayer = { ...player, strokes: 10 };
+        const scoringPlayer = { ...player, strokes: 10 };
         setPlayStateKey('players', [...chosenPlayers, scoringPlayer]);
       }
     }
@@ -53,7 +53,7 @@ const SelectPlayers: React.FC<{
             onChange={(e) => toggleChecked(e.target.value)}
             isChecked={chosenPlayerIds.includes(`${player.id}`)}
           >
-            {player.firstName} {player.lastName}
+            {player.first_name} {player.last_name}
           </Checkbox>
         ))}
       </Stack>

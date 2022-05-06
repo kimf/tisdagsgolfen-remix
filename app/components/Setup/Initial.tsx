@@ -12,12 +12,12 @@ import {
   Switch,
 } from '@chakra-ui/react';
 
-import type { Course } from '@prisma/client';
-import type { PlayState } from '~/routes/play/index';
+import type { definitions } from 'types/supabase';
+import type { PlayState } from './SetupWrapper';
 
 const Initial: React.FC<{
   playState: PlayState;
-  courses: Course[];
+  courses: definitions['courses'][];
   setPlayStateKey: (key: string, value: any) => void;
 }> = ({ playState, courses, setPlayStateKey }) => {
   const setCourseId = (id: string) => {
@@ -86,7 +86,7 @@ const Initial: React.FC<{
         value={playState.course ? playState.course.id : ''}
       >
         <Stack spacing={2} direction="column">
-          {courses.map((course: Course) => (
+          {courses.map((course) => (
             <Radio size="lg" colorScheme="green" key={course.id} value={course.id}>
               {course.club} - {course.name}
             </Radio>
