@@ -1,18 +1,17 @@
 import React from 'react';
 import { Heading } from '@chakra-ui/react';
-
-import type { SeasonWithEventCount } from '~/routes/index';
-
 interface Props {
-  season: SeasonWithEventCount;
+  // TODO: FIX!
+  season: any;
+  events: any;
 }
 
-const SeasonLeaderboard: React.FunctionComponent<Props> = ({ season }) => {
+const SeasonLeaderboard: React.FunctionComponent<Props> = ({ season, events }) => {
   return (
     <div>
       {' '}
       <Heading as="h2" size="md">
-        Ledartavla efter {season._count.events} rundor
+        Ledartavla efter {events.length} rundor
       </Heading>
     </div>
   );

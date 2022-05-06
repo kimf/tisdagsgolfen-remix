@@ -1,16 +1,16 @@
 import React from 'react';
 import { Button, Center, Divider, Heading, List, ListItem, Stack, Text } from '@chakra-ui/react';
-import { Form } from '@remix-run/react';
-
-import type { PlayState, UnsavedTeam } from '~/routes/play/index';
+import { useSubmit } from '@remix-run/react';
 import invariant from 'tiny-invariant';
-import NumberStepper from './NumberStepper';
+import NumberStepper from '../NumberStepper';
+import type { PlayState } from './SetupWrapper';
 
 const Setup: React.FC<{
   playState: PlayState;
   setPlayStateKey: (key: string, value: any) => void;
 }> = ({ playState, setPlayStateKey }) => {
   invariant(playState.course, 'Course has to be set');
+  const submit = useSubmit();
 
   const setStrokes = (id: number, val: number) => {
     const updatedPlayers = playState.players.map((p) => {
@@ -44,82 +44,85 @@ const Setup: React.FC<{
     setPlayStateKey('teams', newTeams);
   };
 
-  const isTeamEvent = playState.eventType === 'TEAM';
+  const submitForm = () => {
+    window.localStorage.removeItem('PLAY_STATE');
+    submit(
+      { json: JSON.stringify(playState) },
+      { method: 'post', action: '/scoring_sessions?index' },
+    );
+  };
 
+  const isTeamEvent = playState.eventType === 'TEAM';
   const selectedPlayerIds = playState.teams.map((t) => t.playerIds).flat();
   const availablePlayers = playState.players.filter((p) => !selectedPlayerIds.includes(p.id));
 
   return (
     <div>
-      <Form action="/scoringsession" method="post" reloadDocument>
-        <input name="json" value={JSON.stringify(playState)} type="hidden" />
+      <Heading size="md" marginBottom={5}>
+        {isTeamEvent ? `Sätt ihop lag (+slag)` : `Ställ in slag`}
+      </Heading>
 
-        <Heading size="md" marginBottom={5}>
-          {isTeamEvent ? `Sätt ihop lag (+slag)` : `Ställ in slag`}
-        </Heading>
-
-        {isTeamEvent && (
-          <Stack spacing={2} direction="column">
-            {playState.teams.map((team: UnsavedTeam, index: number) => {
-              if (availablePlayers.length === 0 && team.playerIds.length === 0) {
-                return null;
-              }
-              return (
-                <li key={index}>
-                  <Stack direction="row">
-                    <Text>Lag {`${index + 1}`}</Text>
-                    <NumberStepper
-                      value={team.strokes}
-                      setValue={(val: number) => setTeamStrokes(index, val)}
-                    />
-                  </Stack>
-                  <List spacing={3}>
-                    {playState.players
-                      .filter((p) => team.playerIds.includes(p.id))
-                      .map((player) => (
-                        <ListItem
-                          bg="green.500"
-                          color="white"
-                          key={player.id}
-                          onClick={() => removePlayerFromTeam(player.id, index)}
-                        >
-                          {player.firstName} {player.lastName}
-                        </ListItem>
-                      ))}
-                    {availablePlayers.map((player) => (
-                      <ListItem key={player.id} onClick={() => addPlayerToTeam(player.id, index)}>
-                        {player.firstName} {player.lastName}
+      {isTeamEvent && (
+        <Stack spacing={2} direction="column">
+          {playState.teams.map((team, index: number) => {
+            if (availablePlayers.length === 0 && team.playerIds.length === 0) {
+              return null;
+            }
+            return (
+              <li key={index}>
+                <Stack direction="row">
+                  <Text>Lag {`${index + 1}`}</Text>
+                  <NumberStepper
+                    value={team.strokes}
+                    setValue={(val: number) => setTeamStrokes(index, val)}
+                  />
+                </Stack>
+                <List spacing={3}>
+                  {playState.players
+                    .filter((p) => team.playerIds.includes(p.id))
+                    .map((player) => (
+                      <ListItem
+                        bg="green.500"
+                        color="white"
+                        key={player.id}
+                        onClick={() => removePlayerFromTeam(player.id, index)}
+                      >
+                        {player.first_name} {player.last_name}
                       </ListItem>
                     ))}
-                  </List>
-                </li>
-              );
-            })}
-          </Stack>
-        )}
-
-        {!isTeamEvent && (
-          <Stack spacing={2} direction="column">
-            {playState.players.map((player) => (
-              <li key={player.id}>
-                {player.firstName} {player.lastName}
-                <NumberStepper
-                  value={player.strokes}
-                  setValue={(val: number) => setStrokes(player.id, val)}
-                />
+                  {availablePlayers.map((player) => (
+                    <ListItem key={player.id} onClick={() => addPlayerToTeam(player.id, index)}>
+                      {player.first_name} {player.last_name}
+                    </ListItem>
+                  ))}
+                </List>
               </li>
-            ))}
-          </Stack>
-        )}
+            );
+          })}
+        </Stack>
+      )}
 
-        <Center height="40px">
-          <Divider />
-        </Center>
+      {!isTeamEvent && (
+        <Stack spacing={2} direction="column">
+          {playState.players.map((player) => (
+            <li key={player.id}>
+              {player.first_name} {player.last_name}
+              <NumberStepper
+                value={player.strokes}
+                setValue={(val: number) => setStrokes(player.id, val)}
+              />
+            </li>
+          ))}
+        </Stack>
+      )}
 
-        <Button type="submit" colorScheme="green">
-          SKAPA RUNDA
-        </Button>
-      </Form>
+      <Center height="40px">
+        <Divider />
+      </Center>
+
+      <Button colorScheme="green" onClick={submitForm}>
+        SKAPA RUNDA
+      </Button>
     </div>
   );
 };

@@ -8,3 +8,7 @@ node_modules
 /build/
 /public/build
 /api/index.js
+
+# Supabase
+**/supabase/.branches
+**/supabase/.temp
