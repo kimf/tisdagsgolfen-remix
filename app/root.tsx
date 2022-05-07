@@ -1,10 +1,36 @@
-import React, { useContext, useEffect } from 'react';
-import { withEmotionCache } from '@emotion/react';
-import { ChakraProvider } from '@chakra-ui/react';
+import type { MetaFunction } from '@remix-run/node';
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
-import type { MetaFunction, LinksFunction } from '@remix-run/node'; // Depends on the runtime you choose
+import { createTheme, CssBaseline, NextUIProvider } from '@nextui-org/react';
+import useDarkMode from '@fisch0920/use-dark-mode';
 
-import { ServerStyleContext, ClientStyleContext } from './context';
+import IndexCss from '~/styles/index.css';
+
+const lightTheme = createTheme({
+  type: 'light',
+  theme: {
+    fonts: {
+      sans: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto','Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;",
+    },
+  },
+});
+
+const darkTheme = createTheme({
+  type: 'dark',
+  theme: {
+    fonts: {
+      sans: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto','Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;",
+    },
+  },
+});
+
+export const links = () => {
+  return [
+    {
+      rel: 'stylesheet',
+      href: IndexCss,
+    },
+  ];
+};
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -12,80 +38,27 @@ export const meta: MetaFunction = () => ({
   viewport: 'width=device-width,initial-scale=1',
 });
 
-export let links: LinksFunction = () => {
-  return [
-    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-    { rel: 'preconnect', href: 'https://fonts.gstaticom' },
-    {
-      rel: 'stylesheet',
-      href: 'https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap',
-    },
-  ];
-};
-
-interface DocumentProps {
-  children: React.ReactNode;
-}
-
-const Document = withEmotionCache(({ children }: DocumentProps, emotionCache) => {
-  const serverStyleData = useContext(ServerStyleContext);
-  const clientStyleData = useContext(ClientStyleContext);
-
-  // Only executed on client
-  useEffect(() => {
-    // re-link sheet container
-    emotionCache.sheet.container = document.head;
-    // re-inject tags
-    const tags = emotionCache.sheet.tags;
-    emotionCache.sheet.flush();
-    tags.forEach((tag) => {
-      (emotionCache.sheet as any)._insertTag(tag);
-    });
-    // reset cache to reapply global styles
-    clientStyleData?.reset();
-  }, []);
+export default function App() {
+  const darkMode = useDarkMode(false);
 
   return (
-    <html lang="en">
+    <html lang="sv">
       <head>
         <Meta />
+        {CssBaseline.flush()}
         <Links />
-        {serverStyleData?.map(({ key, ids, css }) => (
-          <style
-            key={key}
-            data-emotion={`${key} ${ids.join(' ')}`}
-            dangerouslySetInnerHTML={{ __html: css }}
-          />
-        ))}
       </head>
       <body>
-        {children}
+        <NextUIProvider theme={darkMode.value ? darkTheme : lightTheme}>
+          <div className="page-content">
+            <Outlet />
+          </div>
+        </NextUIProvider>
+
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
       </body>
     </html>
-  );
-});
-
-// import { extendTheme, ChakraProvider } from '@chakra-ui/react'
-
-// const colors = {
-//   brand: {
-//     900: '#1a365d',
-//     800: '#153e75',
-//     700: '#2a69ac',
-//   },
-// }
-
-// const theme = extendTheme({ colors })
-
-export default function App() {
-  return (
-    <Document>
-      <ChakraProvider>
-        <Outlet />
-      </ChakraProvider>
-    </Document>
   );
 }

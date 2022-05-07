@@ -1,0 +1,29 @@
+:root {
+  --primary: hsl(180, 59%, 51%);
+}
+
+.page-content {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+@media (prefers-color-scheme: dark) {
+  .navbar {
+    background: #6f6f6f96;
+  }
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+}
+
+.categories-list-item-icon {
+  background-color: #fff;
+}
+@media (prefers-color-scheme: dark) {
+  .categories-list-item-icon {
+    background-color: #eee !important;
+  }
+}

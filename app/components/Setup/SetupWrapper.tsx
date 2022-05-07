@@ -1,5 +1,5 @@
+import { Button, Container, Divider, Spacer } from '@nextui-org/react';
 import React from 'react';
-import { Button } from '@chakra-ui/react';
 import type { definitions } from 'types/supabase';
 
 import Initial from '~/components/Setup/Initial';
@@ -11,6 +11,7 @@ export interface ScoringPlayer {
   strokes: number;
   first_name: string;
   last_name: string;
+  photo?: string;
 }
 export interface ScoringTeam {
   id: number;
@@ -69,8 +70,17 @@ export default function SetupWrapper({
   };
 
   return (
-    <div>
-      {playState.step !== 'initial' && <Button onClick={stepBack}>&larr; Tillbaka</Button>}
+    <Container css={{ paddingTop: '25px' }}>
+      {playState.step !== 'initial' && (
+        <>
+          <Button light color="secondary" size="sm" onClick={stepBack}>
+            &larr; Tillbaka
+          </Button>
+          <Spacer />
+          <Divider />
+          <Spacer />
+        </>
+      )}
       {playState.step === 'initial' && (
         <Initial playState={playState} setPlayStateKey={setPlayStateKey} courses={courses} />
       )}
@@ -85,6 +95,6 @@ export default function SetupWrapper({
       {playState.step === 'setup' && (
         <Setup playState={playState} setPlayStateKey={setPlayStateKey} />
       )}
-    </div>
+    </Container>
   );
 }

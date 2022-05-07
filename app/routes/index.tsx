@@ -1,13 +1,14 @@
 import { json } from '@remix-run/node';
 import type { LoaderFunction } from '@remix-run/node';
-import { Button, Heading } from '@chakra-ui/react';
 import { Link, useLoaderData } from '@remix-run/react';
+import { Button, Container } from '@nextui-org/react';
 
 import Stats from '~/components/Stats';
 import SeasonLeaderboard from '~/components/SeasonLeaderboard';
 import Event from '~/components/Event';
 import type { definitions } from 'types/supabase';
 import supabase from '~/lib/supabase.server';
+import { ThemeToggle } from '~/components/ThemeToggle';
 
 export const loader: LoaderFunction = async () => {
   const { data: season } = await supabase.from('seasons').select('*').eq('name', '2022').single();
@@ -26,14 +27,21 @@ export default function Index() {
   }
 
   return (
-    <div>
-      <Link to="/play">
-        <Button colorScheme="green">NY RUNDA</Button>
-      </Link>
-      <Heading>Tisdagsgolfen {season.name}</Heading>
-      <Stats />
-      <SeasonLeaderboard season={season} events={events} />
-      <Event />
-    </div>
+    <Container>
+      <header>
+        <h2>Tisdagsgolfen {season.name}</h2>
+        <ThemeToggle />
+        <Link to="/play">
+          <Button size="sm" color="gradient">
+            NY RUNDA
+          </Button>
+        </Link>
+      </header>
+      <main>
+        <Stats />
+        <SeasonLeaderboard season={season} events={events} />
+        <Event />
+      </main>
+    </Container>
   );
 }

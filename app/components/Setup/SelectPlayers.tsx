@@ -1,5 +1,5 @@
+import { Button, Checkbox, Spacer, Text, User } from '@nextui-org/react';
 import React from 'react';
-import { Button, Center, Checkbox, Divider, Heading, Stack } from '@chakra-ui/react';
 import type { definitions } from 'types/supabase';
 import type { ScoringPlayer } from './SetupWrapper';
 
@@ -39,33 +39,29 @@ const SelectPlayers: React.FC<{
   };
 
   return (
-    <div>
-      <Heading size="md" marginBottom={5}>
-        Välj spelare
-      </Heading>
-
-      <Stack spacing={2} direction="column">
+    <>
+      <Text h4>Välj Spelare</Text>
+      <Spacer />
+      <Checkbox.Group defaultValue={chosenPlayerIds}>
         {players.map((player) => (
           <Checkbox
-            name="playerIds"
             key={player.id}
-            value={player.id}
-            onChange={(e) => toggleChecked(e.target.value)}
-            isChecked={chosenPlayerIds.includes(`${player.id}`)}
+            name="playerIds"
+            value={player.id.toString()}
+            onChange={(e) => toggleChecked(player.id.toString())}
           >
-            {player.first_name} {player.last_name}
+            <User src={player.photo} name={`${player.first_name} ${player.last_name}`} size="md" />
           </Checkbox>
         ))}
-      </Stack>
-      <Center height="40px">
-        <Divider />
-      </Center>
+      </Checkbox.Group>
+
+      <Spacer y={1} />
       {chosenPlayers.length !== 0 && (
-        <Button colorScheme="green" onClick={gotoSetup}>
+        <Button onClick={gotoSetup}>
           {eventType === 'INDIVIDUAL' ? 'Ställ in slag' : 'Sätt upp lag'}
         </Button>
       )}
-    </div>
+    </>
   );
 };
 

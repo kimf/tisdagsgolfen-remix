@@ -7,11 +7,13 @@ import { ClientOnly } from 'remix-utils';
 import supabase from '~/lib/supabase.server';
 import type { definitions } from 'types/supabase';
 import SetupWrapper from '~/components/Setup/SetupWrapper';
-import { Container } from '@chakra-ui/react';
 
 export const loader: LoaderFunction = async () => {
-  const { data: courses } = await supabase.from('courses');
-  const { data: players } = await supabase.from('players');
+  const coursesPromise = supabase.from('courses');
+  const playersPromise = supabase.from('players');
+
+  let [{ data: courses }, { data: players }] = await Promise.all([coursesPromise, playersPromise]);
+
   return json({
     courses,
     players: players ? players.map((p) => ({ ...p, playerId: p.id, strokes: 10 })) : [],
@@ -25,10 +27,8 @@ export default function PlayIndex() {
   }>();
 
   return (
-    <Container maxW="md" padding={10}>
-      <ClientOnly fallback={<p>Loading...</p>}>
-        {() => <SetupWrapper courses={courses} players={players} />}
-      </ClientOnly>
-    </Container>
+    <ClientOnly fallback={<p>Loading...</p>}>
+      {() => <SetupWrapper courses={courses} players={players} />}
+    </ClientOnly>
   );
 }
