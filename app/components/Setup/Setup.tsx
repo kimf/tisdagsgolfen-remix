@@ -1,9 +1,8 @@
 import React from 'react';
-import { Button, Center, Divider, Heading, List, ListItem, Stack, Text } from '@chakra-ui/react';
 import { useSubmit } from '@remix-run/react';
 import invariant from 'tiny-invariant';
-import NumberStepper from '../NumberStepper';
 import type { PlayState } from './SetupWrapper';
+import { User, Button, Text, Input, Card, Divider, Spacer, Grid } from '@nextui-org/react';
 
 const Setup: React.FC<{
   playState: PlayState;
@@ -57,73 +56,92 @@ const Setup: React.FC<{
   const availablePlayers = playState.players.filter((p) => !selectedPlayerIds.includes(p.id));
 
   return (
-    <div>
-      <Heading size="md" marginBottom={5}>
-        {isTeamEvent ? `Sätt ihop lag (+slag)` : `Ställ in slag`}
-      </Heading>
+    <>
+      <Text h4>{isTeamEvent ? `Sätt ihop lag (+slag)` : `Ställ in slag`}</Text>
 
       {isTeamEvent && (
-        <Stack spacing={2} direction="column">
+        <>
           {playState.teams.map((team, index: number) => {
             if (availablePlayers.length === 0 && team.playerIds.length === 0) {
               return null;
             }
             return (
-              <li key={index}>
-                <Stack direction="row">
+              <Card key={index} hoverable css={{ marginTop: 25 }}>
+                <Card.Header>
                   <Text>Lag {`${index + 1}`}</Text>
-                  <NumberStepper
+                  <Spacer />
+                  <Input
+                    type="number"
+                    bordered
                     value={team.strokes}
-                    setValue={(val: number) => setTeamStrokes(index, val)}
+                    onChange={(e) => setTeamStrokes(index, parseInt(e.target.value, 10))}
                   />
-                </Stack>
-                <List spacing={3}>
+                </Card.Header>
+                <Divider />
+                <Divider />
+                <Card.Body css={{ py: '$10' }}>
+                  <Text>Spelare i laget</Text>
+                  <Spacer />
                   {playState.players
                     .filter((p) => team.playerIds.includes(p.id))
                     .map((player) => (
-                      <ListItem
-                        bg="green.500"
-                        color="white"
+                      <User
+                        src={player.photo}
+                        name={`${player.first_name} ${player.last_name}`}
+                        size="sm"
                         key={player.id}
                         onClick={() => removePlayerFromTeam(player.id, index)}
-                      >
-                        {player.first_name} {player.last_name}
-                      </ListItem>
+                        pointer
+                      />
                     ))}
+                  <Spacer y={2} />
+                  <Divider />
+                  <Spacer y={1} />
+                  <Text>Tillgängliga spelare</Text>
+                  <Spacer />
                   {availablePlayers.map((player) => (
-                    <ListItem key={player.id} onClick={() => addPlayerToTeam(player.id, index)}>
-                      {player.first_name} {player.last_name}
-                    </ListItem>
+                    <User
+                      src={player.photo}
+                      name={`${player.first_name} ${player.last_name}`}
+                      size="sm"
+                      key={player.id}
+                      onClick={() => addPlayerToTeam(player.id, index)}
+                      pointer
+                    />
                   ))}
-                </List>
-              </li>
+                </Card.Body>
+              </Card>
             );
           })}
-        </Stack>
+        </>
       )}
 
       {!isTeamEvent && (
-        <Stack spacing={2} direction="column">
+        <>
           {playState.players.map((player) => (
-            <li key={player.id}>
-              {player.first_name} {player.last_name}
-              <NumberStepper
-                value={player.strokes}
-                setValue={(val: number) => setStrokes(player.id, val)}
-              />
-            </li>
+            <Card key={player.id} hoverable css={{ marginTop: 25 }}>
+              <Card.Header>
+                <User
+                  src={player.photo}
+                  name={`${player.first_name} ${player.last_name}`}
+                  size="sm"
+                />
+              </Card.Header>
+              <Card.Body>
+                <Input
+                  type="number"
+                  bordered
+                  value={player.strokes}
+                  onChange={(e) => setStrokes(player.id, parseInt(e.target.value, 10))}
+                />
+              </Card.Body>
+            </Card>
           ))}
-        </Stack>
+        </>
       )}
 
-      <Center height="40px">
-        <Divider />
-      </Center>
-
-      <Button colorScheme="green" onClick={submitForm}>
-        SKAPA RUNDA
-      </Button>
-    </div>
+      <Button onClick={submitForm}>SKAPA RUNDA</Button>
+    </>
   );
 };
 

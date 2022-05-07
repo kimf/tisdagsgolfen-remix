@@ -1,17 +1,5 @@
+import { Button, Col, Grid, Radio, Spacer, Switch, Text } from '@nextui-org/react';
 import React from 'react';
-import {
-  Button,
-  Center,
-  Divider,
-  FormControl,
-  FormLabel,
-  Heading,
-  Radio,
-  RadioGroup,
-  Stack,
-  Switch,
-} from '@chakra-ui/react';
-
 import type { definitions } from 'types/supabase';
 import type { PlayState } from './SetupWrapper';
 
@@ -20,88 +8,69 @@ const Initial: React.FC<{
   courses: definitions['courses'][];
   setPlayStateKey: (key: string, value: any) => void;
 }> = ({ playState, courses, setPlayStateKey }) => {
-  const setCourseId = (id: string) => {
-    const course = courses.find((c) => `${c.id}` === id);
+  const setCourseId = (id: string | number) => {
+    const course = courses.find((c) => c.id === id);
     setPlayStateKey('course', course);
   };
 
-  return (
-    <div>
-      <FormControl display="flex" alignItems="center">
-        <FormLabel htmlFor="special" mb="0">
-          Specialvecka?
-        </FormLabel>
+  console.log(playState);
 
-        <Switch
-          id="special"
-          size="md"
-          colorScheme="green"
-          isChecked={playState.special}
-          onChange={(e) => setPlayStateKey('special', e.target.checked)}
-        />
-      </FormControl>
-      <Center height="20px">
-        <Divider />
-      </Center>
-      <RadioGroup
-        name="eventType"
+  return (
+    <>
+      <Grid.Container gap={2}>
+        <Grid>
+          <Switch
+            id="special"
+            size="lg"
+            checked={playState.special}
+            onChange={(e) => setPlayStateKey('special', e.target.checked)}
+          />
+        </Grid>
+        <Grid>
+          <Text h4>Vanlig vecka</Text>
+        </Grid>
+      </Grid.Container>
+      <Spacer y={1} />
+      <Radio.Group
         onChange={(val) => setPlayStateKey('eventType', val)}
         value={playState.eventType}
+        row
       >
-        <Stack spacing={5} direction="row">
-          <Radio size="lg" colorScheme="green" value="INDIVIDUAL">
-            Individuellt
-          </Radio>
-          <Radio size="lg" colorScheme="green" value="TEAM">
-            Lag
-          </Radio>
-        </Stack>
-      </RadioGroup>
-      <Center height="20px">
-        <Divider />
-      </Center>
-      <RadioGroup
-        name="scoringType"
+        <Radio size="lg" value="INDIVIDUAL">
+          Individuellt
+        </Radio>
+        <Radio size="lg" value="TEAM">
+          Lag
+        </Radio>
+      </Radio.Group>
+      <Spacer y={1} />
+      <Radio.Group
         onChange={(val) => setPlayStateKey('scoringType', val)}
         value={playState.scoringType}
+        row
       >
-        <Stack spacing={5} direction="row">
-          <Radio size="lg" colorScheme="green" value="POINTS">
-            Poäng
+        <Radio size="lg" value="POINTS">
+          Poäng
+        </Radio>
+        <Radio size="lg" value="STROKES">
+          Slag
+        </Radio>
+      </Radio.Group>
+      <Spacer y={1} />
+
+      <Text h3>Välj bana</Text>
+      <Radio.Group onChange={setCourseId} value={playState.course ? playState.course.id : ''}>
+        {courses.map((course) => (
+          <Radio size="lg" key={course.id} value={course.id}>
+            {course.club} - {course.name}
           </Radio>
-          <Radio size="lg" colorScheme="green" value="STROKES">
-            Slag
-          </Radio>
-        </Stack>
-      </RadioGroup>
-      <Center height="40px">
-        <Divider />
-      </Center>
-      <Heading size="md" marginBottom={5}>
-        Välj bana
-      </Heading>
-      <RadioGroup
-        name="courseId"
-        onChange={setCourseId}
-        value={playState.course ? playState.course.id : ''}
-      >
-        <Stack spacing={2} direction="column">
-          {courses.map((course) => (
-            <Radio size="lg" colorScheme="green" key={course.id} value={course.id}>
-              {course.club} - {course.name}
-            </Radio>
-          ))}
-        </Stack>
-      </RadioGroup>
-      <Center height="40px">
-        <Divider />
-      </Center>
+        ))}
+      </Radio.Group>
+      <Spacer y={1} />
       {playState.course && (
-        <Button colorScheme="green" onClick={() => setPlayStateKey('step', 'players')}>
-          Välj Spelare
-        </Button>
+        <Button onClick={() => setPlayStateKey('step', 'players')}>Välj Spelare</Button>
       )}
-    </div>
+    </>
   );
 };
 

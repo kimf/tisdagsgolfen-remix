@@ -4,9 +4,7 @@ import { Heading } from '@chakra-ui/react';
 const Event = () => {
   return (
     <div>
-      <Heading as="h2" size="md">
-        Event leaderboard
-      </Heading>
+      <h2>Event leaderboard</h2>
     </div>
   );
 };
